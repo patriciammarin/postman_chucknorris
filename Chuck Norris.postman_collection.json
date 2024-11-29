@@ -1,0 +1,226 @@
+{
+	"info": {
+		"_postman_id": "b96eff6f-18f0-4e73-bc3e-e84789d57baa",
+		"name": "Chuck Norris",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39657931"
+	},
+	"item": [
+		{
+			"name": "Chiste aleatorio",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Response body contains a joke\", function () {\r",
+							"    pm.expect(pm.response.json().value).to.be.a('string');\r",
+							"    pm.expect(pm.response.json().value).to.not.be.empty;\r",
+							"});\r",
+							"pm.test(\"Response body contains a non-empty joke value\", function () {\r",
+							"    pm.expect(pm.response.json().value).to.not.be.empty;\r",
+							"});\r",
+							"pm.test(\"Pressing 'r' button gives a new joke\", function () {\r",
+							"    pm.expect(pm.response.json().id).to.not.equal(pm.collectionVariables.get(\"previousJokeId\"));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.chucknorris.io/jokes/random",
+					"protocol": "https",
+					"host": [
+						"api",
+						"chucknorris",
+						"io"
+					],
+					"path": [
+						"jokes",
+						"random"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lista de categorías",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Categories are sorted alphabetically\", function () {\r",
+							"    var categories = pm.response.json();\r",
+							"    var sortedCategories = categories.sort();\r",
+							"    pm.expect(categories).to.eql(sortedCategories);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Categories are valid\", function () {\r",
+							"    var categories = pm.response.json();\r",
+							"    pm.expect(categories).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Categories list is not empty\", function () {\r",
+							"    var categories = pm.response.json();\r",
+							"    pm.expect(categories).to.be.an('array').that.is.not.empty;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.chucknorris.io/jokes/categories",
+					"protocol": "https",
+					"host": [
+						"api",
+						"chucknorris",
+						"io"
+					],
+					"path": [
+						"jokes",
+						"categories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Búsqueda de texto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Valid search term returns relevant results\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"    pm.expect(pm.response.json().result).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Handle empty search results\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(400);\r",
+							"    pm.expect(pm.response.text()).to.include(\"HTTP Status 400 – Bad Request\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Handle special characters in search query\", function () {\r",
+							"    pm.sendRequest({\r",
+							"        url: 'https://api.chucknorris.io/jokes/search?query=%23special%24characters%21',\r",
+							"        method: 'GET',\r",
+							"        header: {\r",
+							"            'Content-Type': 'application/json'\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        pm.expect(res).to.have.status(200);\r",
+							"        pm.expect(res.json().result).to.be.an('array').that.is.not.empty;\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.chucknorris.io/jokes/search?query={query}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"chucknorris",
+						"io"
+					],
+					"path": [
+						"jokes",
+						"search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{query}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Chiste aleatorio de una categoría determinada",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Valid category is handled correctly\", function () {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 400]);\r",
+							"    pm.expect(pm.response.text()).to.include(\"Bad Request\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Handling of invalid or unknown categories\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(400);\r",
+							"    pm.expect(pm.response.text()).to.include(\"Bad Request\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Reasonable response time\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.chucknorris.io/jokes/random?category={category}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"chucknorris",
+						"io"
+					],
+					"path": [
+						"jokes",
+						"random"
+					],
+					"query": [
+						{
+							"key": "category",
+							"value": "{category}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
